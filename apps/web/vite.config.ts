@@ -45,6 +45,7 @@ export default defineConfig({
       babelConfig: {
         babelrc: false, // don’t merge other Babel files
         configFile: false,
+        presets: ['@babel/preset-typescript'],
         plugins: ['styled-jsx/babel'],
       },
     }),
@@ -76,6 +77,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
     dedupe: ['react', 'react-dom'],
+  },
+  build: {
+    target: 'esnext',
   },
   clearScreen: false,
   server: {

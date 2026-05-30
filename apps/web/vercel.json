@@ -18,7 +18,7 @@
       "destination": "/api/:path*"
     },
     {
-      "source": "/((?!google746eaa9d3bb45f83\\.html|sitemap\\.xml|robots\\.txt|\\.well-known).*)",
+      "source": "/((?!assets/|favicon\\.ico|manifest\\.json|google746eaa9d3bb45f83\\.html|sitemap\\.xml|robots\\.txt|\\.well-known).*)",
       "destination": "/api"
     }
   ]

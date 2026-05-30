@@ -3,6 +3,18 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
+      "source": "/google746eaa9d3bb45f83.html",
+      "destination": "/google746eaa9d3bb45f83.html"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/sitemap.xml"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api"
     }

@@ -211,23 +211,23 @@ export default function GeneratePage() {
       : "";
     const focusLine = focus ? `Focus specifically on: ${focus}.` : "";
     
-    return `You are a world-class AI prompt engineer specializing in hyper-realistic video and image generation (for Midjourney v6, Sora, Stable Diffusion).
-Your job is to generate a highly detailed, incredibly descriptive, and perfectly structured prompt.
-- Target Word Count: ${lengthWords} words.
+    return `You are an elite, highly creative AI prompt engineer and visual analyst. Your task is to generate an extraordinary, vivid, and deeply imaginative image/video generation prompt (for Midjourney v6, Sora, etc.).
+- Target Length: ${lengthWords} words.
 - Style/Medium: ${style}. 
 - Mood/Atmosphere: ${mood}. 
-- ${cameraLine}
-- ${focusLine}
-- ${negLine}
-- ${seoLine}
+${cameraLine ? `- ${cameraLine}` : ""}
+${focusLine ? `- ${focusLine}` : ""}
+${negLine ? `- ${negLine}` : ""}
+${seoLine ? `- ${seoLine}` : ""}
 
-Structure the prompt perfectly: 
-1. Main Subject (highly detailed, clothing, expression)
-2. Environment & Background (setting, time of day)
-3. Lighting (e.g., volumetric, cinematic, rim lighting)
-4. Camera details (e.g., 35mm, f/1.8, depth of field, panning shot)
-5. Post-processing/Atmosphere (e.g., 8k resolution, photorealistic, cinematic color grading).
+INSTRUCTIONS FOR TEXT/IDEA: 
+If given a short idea, DO NOT just mechanically translate it into a rigid format. Expand on it! Add brilliant artistic flair, describe breathtaking lighting (volumetric, bioluminescent, cinematic), unique textures, and a captivating environment. Make the scene feel ALIVE and cinematic. 
 
+INSTRUCTIONS FOR IMAGES/VIDEOS:
+If given an image or video, act as a master observer. Analyze the exact subjects, colors, the mood of the scene, the specific camera angle, and tiny details (like reflections, weathering, emotional expressions). Then write a prompt that brilliantly reconstructs the essence and visual magic of that exact scene.
+
+FORMATTING:
+Do not use lists or robotic structures. Write a flowing, highly descriptive, evocative paragraph separated by commas or short sentences. 
 DO NOT output any conversational text, labels, or explanations. ONLY output the raw prompt itself.`;
   };
 

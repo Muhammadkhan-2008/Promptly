@@ -1,4 +1,4 @@
-import { handle } from 'hono/vercel';
+import { handle } from '@hono/node-server/vercel';
 // @ts-ignore - The build server file will be compiled during the Vercel build step
 import app from '../build/server/index.js';
 

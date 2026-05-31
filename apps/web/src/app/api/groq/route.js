@@ -33,7 +33,7 @@ export async function POST(request) {
       return Response.json(data);
     }
 
-    // Streaming: Parse SSE from Groq and stream back plain text only
+    // Streaming: Parse SSE from Groq and stream back standard SSE format
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
       async start(controller) {
@@ -59,7 +59,10 @@ export async function POST(request) {
               try {
                 const json = JSON.parse(trimmed.slice(6));
                 const text = json.choices?.[0]?.delta?.content;
-                if (text) controller.enqueue(encoder.encode(text));
+                if (text) {
+                  const openAiChunk = { choices: [{ delta: { content: text } }] };
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify(openAiChunk)}\n\n`));
+                }
               } catch (e) {
                 /* skip malformed */
               }
@@ -71,7 +74,7 @@ export async function POST(request) {
 
     return new Response(readable, {
       headers: {
-        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },

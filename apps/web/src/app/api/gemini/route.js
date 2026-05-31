@@ -3,7 +3,7 @@ export async function POST(request) {
     const body = await request.json();
     const { messages, stream = true, file } = body;
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.gemini;
     if (!apiKey) {
       return Response.json(
         { error: "GEMINI_API_KEY is not configured in the server." },

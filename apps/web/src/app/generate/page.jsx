@@ -125,19 +125,52 @@ export default function GeneratePage() {
 
   const processFile = async (file) => {
     if (!file) return;
-    if (file.size > 4 * 1024 * 1024) {
-      toast.error("File is too large. Max 4MB allowed.");
+    if (file.size > 15 * 1024 * 1024) {
+      toast.error("File is too large. Max 15MB allowed.");
       return;
     }
     
     setIsUploading(true);
+
+    if (file.type.startsWith("video/")) {
+      const video = document.createElement("video");
+      video.src = URL.createObjectURL(file);
+      video.muted = true;
+      video.playsInline = true;
+      video.crossOrigin = "anonymous";
+      
+      video.onloadeddata = () => {
+        video.currentTime = Math.min(1, video.duration / 2);
+      };
+      
+      video.onseeked = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const base64Data = canvas.toDataURL("image/jpeg").split(",")[1];
+        
+        setUploadedUrl({ data: base64Data, mimeType: "image/jpeg" });
+        setUploadedName(file.name);
+        setIsUploading(false);
+        toast.success("Video frame ready for AI analysis!");
+      };
+      
+      video.onerror = () => {
+        setIsUploading(false);
+        toast.error("Failed to process video.");
+      };
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
       const base64Data = reader.result.split(',')[1];
       setUploadedUrl({ data: base64Data, mimeType: file.type });
       setUploadedName(file.name);
       setIsUploading(false);
-      toast.success("File ready for AI analysis!");
+      toast.success("Image ready for AI analysis!");
     };
     reader.onerror = () => {
       setIsUploading(false);

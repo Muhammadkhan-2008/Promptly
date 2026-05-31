@@ -17,6 +17,8 @@ import NeonAdapter from './adapter';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
 import { API_BASENAME, api } from './route-builder';
+// @ts-ignore
+import * as build from "virtual:react-router/server-build";
 neonConfig.webSocketConstructor = ws;
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
@@ -296,8 +298,6 @@ async function bootstrapHonoServer(options: any) {
   // If we are on Vercel, build the Hono server ourselves to prevent it from calling serve()!
   if (process.env['VERCEL']) {
     const mode = 'production';
-    // @ts-ignore
-    const build = await import("virtual:react-router/server-build");
     const basename = process.env['REACT_ROUTER_HONO_SERVER_BASENAME'] || '/';
     
     const reactRouterApp = new Hono({ strict: false });

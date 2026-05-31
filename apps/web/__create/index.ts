@@ -11,7 +11,6 @@ import { cors } from 'hono/cors';
 import { proxy } from 'hono/proxy';
 import { bodyLimit } from 'hono/body-limit';
 import { requestId } from 'hono/request-id';
-import { createHonoServer } from 'react-router-hono-server/node';
 import { serializeError } from 'serialize-error';
 import ws from 'ws';
 import NeonAdapter from './adapter';
@@ -293,7 +292,39 @@ app.use('/api/auth/*', async (c, next) => {
 });
 app.route(API_BASENAME, api);
 
-export default await createHonoServer({
+async function bootstrapHonoServer(options: any) {
+  // If we are on Vercel, build the Hono server ourselves to prevent it from calling serve()!
+  if (process.env['VERCEL']) {
+    const mode = 'production';
+    // @ts-ignore
+    const build = await import("virtual:react-router/server-build");
+    const basename = process.env['REACT_ROUTER_HONO_SERVER_BASENAME'] || '/';
+    
+    const reactRouterApp = new Hono({ strict: false });
+    reactRouterApp.use(async (c, next) => {
+      const { createMiddleware } = await import('hono/factory');
+      return createMiddleware(async (c2) => {
+        const { createRequestHandler } = await import('react-router');
+        const requestHandler = createRequestHandler(build as any, mode);
+        const loadContext = options.getLoadContext?.(c2, { build, mode });
+        return requestHandler(c2.req.raw, loadContext instanceof Promise ? await loadContext : loadContext);
+      })(c, next);
+    });
+    
+    app.route(`${basename}`, reactRouterApp);
+    if (basename && basename !== '/') {
+      app.route(`${basename}.data`, reactRouterApp);
+    }
+    
+    return app;
+  }
+
+  // If we are in local development or not on Vercel, delegate to the official react-router-hono-server
+  const { createHonoServer } = await import('react-router-hono-server/node');
+  return await createHonoServer(options);
+}
+
+export default await bootstrapHonoServer({
   app,
   defaultLogger: false,
 });

@@ -655,7 +655,7 @@ export default function HomePage() {
             </span>
           </a>
           <p style={{ color: "#CCC", fontSize: 12, fontWeight: 500 }}>
-            © 2026 Promptly · Free AI Prompt Generator · Powered by Groq &
+            © 2026 Promptlies · Free AI Prompt Generator · Powered by Groq &
             Gemini
           </p>
           <div style={{ display: "flex", gap: 18 }}>

@@ -103,7 +103,7 @@ export default function AboutPage() {
         >
           <img
             src={LOGO}
-            alt="Promptly"
+            alt="Promptlies"
             style={{
               width: 64,
               height: 64,
@@ -132,7 +132,7 @@ export default function AboutPage() {
                 backgroundClip: "text",
               }}
             >
-              Promptly
+              Promptlies
             </span>
           </h1>
           <p
@@ -193,10 +193,11 @@ export default function AboutPage() {
               great prompts. Most creators see an amazing AI video and wonder:
               <em style={{ color: "#555" }}>"How do I recreate that?"</em>
             </p>
-            <p style={{ color: "#777", lineHeight: 1.8, fontSize: 15 }}>
-              Promptly solves that. We give everyone — regardless of budget or
-              skill — the power to decode any visual into a structured,
-              ready-to-use prompt instantly.
+            <p style={{ fontSize: 16, color: "#555", lineHeight: 1.7 }}>
+              Creating the perfect prompt used to mean hours of trial and error or paying for expensive prompt libraries. 
+              <strong> Promptlies solves that.</strong> We give everyone — regardless of budget or 
+              technical skill — the ability to translate their imagination (or their existing media) into 
+              flawless AI instructions instantly.
             </p>
           </div>
           <div
@@ -493,12 +494,12 @@ export default function AboutPage() {
                   backgroundClip: "text",
                 }}
               >
-                ly
+                lies
               </span>
             </span>
           </a>
           <p style={{ color: "#CCC", fontSize: 12 }}>
-            © 2026 Promptly · Free AI Prompt Generator
+            © 2026 Promptlies · Free AI Prompt Generator
           </p>
           <div style={{ display: "flex", gap: 16 }}>
             {[

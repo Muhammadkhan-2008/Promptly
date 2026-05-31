@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { Upload, Copy, Check, X, Search, Sparkles } from "lucide-react";
-import useUpload from "@/utils/useUpload";
 import useHandleStreamResponse from "@/utils/useHandleStreamResponse";
 import { toast, Toaster } from "sonner";
 import Navbar from "@/components/Navbar";
@@ -101,7 +100,7 @@ export default function GeneratePage() {
   const [seoKeywords, setSeoKeywords] = useState([]);
   const [seoLoading, setSeoLoading] = useState(false);
 
-  const [upload, { loading: isUploading }] = useUpload();
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleStreamResponse = useHandleStreamResponse({
     onChunk: (text) => setPrompt(text),
@@ -126,14 +125,25 @@ export default function GeneratePage() {
 
   const processFile = async (file) => {
     if (!file) return;
-    const { url, error } = await upload({ url: URL.createObjectURL(file) });
-    if (error) {
-      toast.error("Upload failed. Try a smaller file.");
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("File is too large. Max 4MB allowed.");
       return;
     }
-    setUploadedUrl(url);
-    setUploadedName(file.name);
-    toast.success("File uploaded!");
+    
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Data = reader.result.split(',')[1];
+      setUploadedUrl({ data: base64Data, mimeType: file.type });
+      setUploadedName(file.name);
+      setIsUploading(false);
+      toast.success("File ready for AI analysis!");
+    };
+    reader.onerror = () => {
+      setIsUploading(false);
+      toast.error("Failed to read file.");
+    };
+    reader.readAsDataURL(file);
   };
 
   const boostSeo = async () => {
@@ -160,16 +170,32 @@ export default function GeneratePage() {
 
   const buildSystemPrompt = () => {
     const lengthWords =
-      length === "short" ? "50" : length === "medium" ? "120" : "250";
-    const cameraLine = camera !== "Auto" ? `Camera: ${camera}.` : "";
+      length === "short" ? "20-40" : length === "medium" ? "60-100" : "150-250";
+    const cameraLine = camera !== "Auto" ? `Camera & Angles: ${camera}.` : "";
     const negLine = negativePrompt ? `Do NOT include: ${negativePrompt}.` : "";
     const seoLine = seoKeywords.length
       ? `Naturally include these concepts: ${seoKeywords.join(", ")}.`
       : "";
     const focusLine = focus ? `Focus specifically on: ${focus}.` : "";
-    return `You are an expert AI prompt engineer specializing in video and image generation.
-Style: ${style}. Mood: ${mood}. ${cameraLine} ${focusLine} ${negLine} ${seoLine}
-Write a prompt of approximately ${lengthWords} words. Output ONLY the prompt text, no labels or explanation.`;
+    
+    return `You are a world-class AI prompt engineer specializing in hyper-realistic video and image generation (for Midjourney v6, Sora, Stable Diffusion).
+Your job is to generate a highly detailed, incredibly descriptive, and perfectly structured prompt.
+- Target Word Count: ${lengthWords} words.
+- Style/Medium: ${style}. 
+- Mood/Atmosphere: ${mood}. 
+- ${cameraLine}
+- ${focusLine}
+- ${negLine}
+- ${seoLine}
+
+Structure the prompt perfectly: 
+1. Main Subject (highly detailed, clothing, expression)
+2. Environment & Background (setting, time of day)
+3. Lighting (e.g., volumetric, cinematic, rim lighting)
+4. Camera details (e.g., 35mm, f/1.8, depth of field, panning shot)
+5. Post-processing/Atmosphere (e.g., 8k resolution, photorealistic, cinematic color grading).
+
+DO NOT output any conversational text, labels, or explanations. ONLY output the raw prompt itself.`;
   };
 
   const generate = async () => {
@@ -190,24 +216,34 @@ Write a prompt of approximately ${lengthWords} words. Output ONLY the prompt tex
     const userMsg =
       mode === "text"
         ? `Create a detailed AI generation prompt for this idea: "${textIdea}"`
-        : `Analyze this ${mode} (${uploadedUrl}) and create a detailed AI generation prompt that could recreate it.`;
+        : `Analyze this attached ${mode} closely. Extract its key visual elements, lighting, composition, mood, and style. Then, create a detailed AI generation prompt that could recreate it flawlessly.`;
 
     try {
       if (variations) {
         // Generate 3 variations non-streaming
-        const res = await fetch("/api/groq", {
+        const isVision = mode === "video" || mode === "image";
+        const endpoint = isVision ? "/api/gemini" : "/api/groq";
+        const body = isVision
+          ? {
+              messages: [{ role: "user", content: `${sys}\n\n${userMsg}\n\nGenerate 3 different prompt variations. Separate each with "---VARIATION---". Each should be distinct in approach but same style/mood.` }],
+              file: uploadedUrl,
+              stream: false,
+            }
+          : {
+              messages: [
+                { role: "system", content: sys },
+                {
+                  role: "user",
+                  content: `${userMsg}\n\nGenerate 3 different prompt variations. Separate each with "---VARIATION---". Each should be distinct in approach but same style/mood.`,
+                },
+              ],
+              stream: false,
+            };
+
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: [
-              { role: "system", content: sys },
-              {
-                role: "user",
-                content: `${userMsg}\n\nGenerate 3 different prompt variations. Separate each with "---VARIATION---". Each should be distinct in approach but same style/mood.`,
-              },
-            ],
-            stream: false,
-          }),
+          body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error("Generation failed");
         const data = await res.json();
@@ -218,16 +254,15 @@ Write a prompt of approximately ${lengthWords} words. Output ONLY the prompt tex
           .filter(Boolean);
         setPrompts(parts.length >= 2 ? parts : [full]);
         setIsGenerating(false);
-        await saveToHistory(full, mode, uploadedUrl);
+        await saveToHistory(full, mode, uploadedUrl?.data ? "local-file" : null);
       } else {
         // Single streaming
         const isVision = mode === "video" || mode === "image";
-        const endpoint = isVision
-          ? "/integrations/google-gemini-2-5-flash/"
-          : "/api/groq";
+        const endpoint = isVision ? "/api/gemini" : "/api/groq";
         const body = isVision
           ? {
               messages: [{ role: "user", content: `${sys}\n\n${userMsg}` }],
+              file: uploadedUrl,
               stream: true,
             }
           : {

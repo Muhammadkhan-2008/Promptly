@@ -15,17 +15,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <title>Promptly – Free AI Prompt Generator</title>
+        <title>Promptlies – Free AI Prompt Generator</title>
         <meta
           name="description"
           content="Turn any video or image into a perfect AI prompt. Free, fast, no sign-up needed."
         />
         <meta
           name="keywords"
-          content="Promptly, AI prompt generator, video to prompt, image to prompt, reverse prompt generator, Sora prompts, Midjourney prompts, Runway ML prompts, Stable Diffusion prompts, ChatGPT prompts, free AI prompts"
+          content="Promptlies, AI prompt generator, video to prompt, image to prompt, reverse prompt generator, Sora prompts, Midjourney prompts, Runway ML prompts, Stable Diffusion prompts, ChatGPT prompts, free AI prompts"
         />
         <link rel="canonical" href="https://promptlies.vercel.app/" />
-        <meta property="og:title" content="Promptly – Free AI Prompt Generator" />
+        <meta property="og:title" content="Promptlies – Free AI Prompt Generator" />
         <meta
           property="og:description"
           content="Turn any video or image into a perfect AI prompt. Free, fast, no sign-up needed."
@@ -33,7 +33,7 @@ export default function RootLayout({ children }) {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://promptlies.vercel.app/" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Promptly – Free AI Prompt Generator" />
+        <meta name="twitter:title" content="Promptlies – Free AI Prompt Generator" />
         <meta
           name="twitter:description"
           content="Turn any video or image into a perfect AI prompt. Free, fast, no sign-up needed."
